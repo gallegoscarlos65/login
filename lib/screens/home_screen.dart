@@ -24,14 +24,30 @@ class HomeScreen extends StatelessWidget {
         title: Text('Productos'),
       ),
       body: ListView.builder(
-        itemCount: 10,
+        itemCount: productsService.products.length,
         itemBuilder: ( BuildContext context, int index) => GestureDetector(
-          onTap: () => Navigator.pushNamed(context, 'product'),
-          child: ProductCard(product: productsService.products[1],))
+          onTap: () {
+
+            //Se crea una copia del producto para cuando este valla a la pantalla de editar
+            productsService.selectedProduct = productsService.products[index].copy();
+            Navigator.pushNamed(context, 'product');
+          },
+          child: ProductCard(
+            product: productsService.products[index],
+          ))
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){},
-          child: Icon(Icons.add),),
+          onPressed: (){
+
+            productsService.selectedProduct = new Product(
+              available: false, 
+              name: 'producto temporal', 
+              price: 0.0);
+            Navigator.pushNamed(context, 'product');
+
+          },
+          child: Icon(Icons.add),
+          ),
    );
   }
 }
