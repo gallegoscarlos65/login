@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -30,7 +31,7 @@ class ProductsService extends ChangeNotifier {
     notifyListeners();
 
     //authority, unencodedPath
-    final url = Uri.https(_baseUrl, 'producst.json');
+    final url = Uri.https(_baseUrl, 'products.json');
     final resp = await http.get(url);
 
     //Se tiene que transformar ese body en un mapa
@@ -77,7 +78,8 @@ class ProductsService extends ChangeNotifier {
 
   Future<String> updateProduct(Product product) async {
 //producst
-    final url = Uri.https(_baseUrl, 'producst/${ product.id }.json');
+    final url = Uri.https(_baseUrl, 'products/${ product.id }.json');
+    //final url = Uri.https(_baseUrl, 'producst/${ product.id }.json');
     final resp = await http.put(url, body: product.toJson());
     final decodedData = resp.body;
 
@@ -96,7 +98,8 @@ class ProductsService extends ChangeNotifier {
 
   Future<String> createProduct(Product product) async {
 //producst
-    final url = Uri.https(_baseUrl, 'producst.json');
+    final url = Uri.https(_baseUrl, 'products.json');
+    // final url = Uri.https(_baseUrl, 'producst.json');
     final resp = await http.post(url, body: product.toJson());
     final decodedData = json.decode(resp.body);
 
@@ -122,6 +125,7 @@ class ProductsService extends ChangeNotifier {
   // El signo de ? es para ponerlo opcional
   Future<String?> uploadImage() async {
 
+    print('El valor de esto es: ${this.newPictureFile}');
     if( this.newPictureFile == null) return null;
 
     this.isSaving = true;
@@ -131,7 +135,7 @@ class ProductsService extends ChangeNotifier {
 
     final imageUploadRequest = http.MultipartRequest('POST', url);
 
-    final file = await http.MultipartFile.fromString('file', newPictureFile!.path);
+    final file = await http.MultipartFile.fromPath('file', newPictureFile!.path);
 
     imageUploadRequest.files.add(file);
 
@@ -139,11 +143,18 @@ class ProductsService extends ChangeNotifier {
     final streamResponse = await imageUploadRequest.send();
     final resp = await http.Response.fromStream(streamResponse);
 
+    print('La respuesta es: ${resp.statusCode}');
     if(resp.statusCode != 200 && resp.statusCode != 201) {
       print('algo salio mal');
       print(resp.body);
       return null;
     }
+
+    // if(resp.statusCode != 400 && resp.statusCode != 401) {
+    //   print('algo salio mal');
+    //   print(resp.body);
+    //   return null;
+    // }
 
     this.newPictureFile = null;
 
@@ -156,6 +167,30 @@ class ProductsService extends ChangeNotifier {
     //final file = await http.
 
   }
+
+      //Todo:Metodo para refrescar la lista de productos
+
+      //Todo: Metodos para eliminar
+      // Future<void> refreshProducts() {
+      //   final duracion = Duration(seconds: 1);
+     
+      //   Timer(duracion, () {
+      //     products.clear();
+      //     loadProducts();
+      //   });
+      //   // print('cuanto dura ${duracion}');
+      //   return Future.delayed(duracion);
+      // }
+
+      // Future<String> deletedProducto(Product product) async {
+      //   final url = Uri.https(_baseUrl, 'products/${product.id}.json');
+      //   final resp = await http.delete(url);
+
+      //   final decodeData = json.decode(resp.body);
+
+      //   notifyListeners();
+      //   return product.id!;
+      // }
 
 
 }
