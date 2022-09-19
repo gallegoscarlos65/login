@@ -13,6 +13,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final productsService = Provider.of<ProductsService>(context);
+    //Podria ir tambien en el onPressed
+    final authService = Provider.of<AuthService>(context, listen: false);
 
     if(productsService.isLoading) return LoadingScreen();
 
@@ -22,6 +24,15 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Productos'),
+        //Para moverlo a la derecha seria en vez de leading, action
+        leading: IconButton(
+          onPressed: (){
+
+            authService.logout();
+            Navigator.pushReplacementNamed(context, 'login');
+
+        }, 
+        icon: Icon(Icons.login_outlined),),
       ),
       body: ListView.builder(
         itemCount: productsService.products.length,

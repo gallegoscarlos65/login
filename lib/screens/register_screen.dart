@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:productos_app/providers/login_form_provider.dart';
+import 'package:productos_app/services/services.dart';
+
 import 'package:productos_app/ui/input_decorations.dart';
 import 'package:productos_app/widgets/widgets.dart';
-import 'package:provider/provider.dart';
+
 
 
 class RegisterScreen extends StatelessWidget {
@@ -33,7 +37,18 @@ class RegisterScreen extends StatelessWidget {
               ),
 
               SizedBox(height: 50,),
-              Text('¿Ya tienes una cuenta', style: TextStyle(fontSize: 18 , fontWeight: FontWeight.bold),),
+
+              TextButton(
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
+                  //Para hacer los bordes como redondeados
+                  shape: MaterialStateProperty.all(StadiumBorder())
+                ),
+                //El pushReplacementNamed destruye el stack de pantallas que se tenia anteriormente
+                onPressed: () => Navigator.pushReplacementNamed(context, 'login'),
+                  child: Text('¿Ya tienes una cuenta?', style: TextStyle(fontSize: 18 , fontWeight: FontWeight.bold),),
+                ), 
+
               SizedBox(height: 50,)
             ],
           ),
@@ -127,20 +142,33 @@ class _LoginForm extends StatelessWidget {
               onPressed: loginForm.isLoading ? null : () async{
                   //Para quitar el teclado cuando pulsan el boton
                   FocusScope.of(context).unfocus();
+                  final authService = Provider.of<AuthService>(context, listen: false);
+
 
                   // TODO: Login form
                   //Si esto es false que no haga nada
-                  if(!loginForm.isValidForm()) return;
+                  if(!loginForm.isValidForm() ) return;
                   //Si esto esta bien que navege a la siguiente pantalla
                   //El pushReplacementNamed, destruye el stack de las pantallas y ya no se puede regresar
                   loginForm.isLoading = true;
 
-                  await Future.delayed(Duration(seconds: 2));
-                  //Validar si el loign es correcto
-                  loginForm.isLoading = false;
-                  Navigator.pushReplacementNamed(context, 'home');
 
-              })
+                  // TODO: Validar si el login es correcto
+                  final String? errorMessage = await authService.createUser(loginForm.email, loginForm.password);
+                  if(errorMessage == null){
+                    Navigator.pushReplacementNamed(context, 'home');
+                  } else{
+                    //TODO: mostrar error en pantalla
+                    print(errorMessage);
+                  }
+
+
+                  //await Future.delayed(Duration(seconds: 2));
+                  //TODO: Validar si el loign es correcto
+                  loginForm.isLoading = false;
+                  //Navigator.pushReplacementNamed(context, 'home');
+              }
+              )
           ],
           
 

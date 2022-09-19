@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productos_app/providers/login_form_provider.dart';
+import 'package:productos_app/services/services.dart';
 import 'package:productos_app/ui/input_decorations.dart';
 import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -136,6 +137,8 @@ class _LoginForm extends StatelessWidget {
               onPressed: loginForm.isLoading ? null : () async{
                   //Para quitar el teclado cuando pulsan el boton
                   FocusScope.of(context).unfocus();
+                  final authService = Provider.of<AuthService>(context, listen: false);
+
 
                   // TODO: Login form
                   //Si esto es false que no haga nada
@@ -144,11 +147,24 @@ class _LoginForm extends StatelessWidget {
                   //El pushReplacementNamed, destruye el stack de las pantallas y ya no se puede regresar
                   loginForm.isLoading = true;
 
-                  await Future.delayed(Duration(seconds: 2));
-                  //Validar si el loign es correcto
-                  loginForm.isLoading = false;
-                  Navigator.pushReplacementNamed(context, 'home');
 
+                  // TODO: Validar si el login es correcto
+                  final String? errorMessage = await authService.login(loginForm.email, loginForm.password);
+                  if(errorMessage == null){
+                    Navigator.pushReplacementNamed(context, 'home');
+                  } else{
+                    //NotificationsService.showSnackbar(errorMessage);
+                    NotificationsService.showSnackbar('Usuario o contraseña incorrectos');
+                    loginForm.isLoading = false;
+                    //TODO: mostrar error en pantalla
+                    //print(errorMessage);
+                  }
+
+
+                  //await Future.delayed(Duration(seconds: 2));
+                  //TODO: Validar si el loign es correcto
+
+                  //Navigator.pushReplacementNamed(context, 'home');
               })
           ],
           

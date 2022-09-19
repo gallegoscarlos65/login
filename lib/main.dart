@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productos_app/screens/screens.dart';
-import 'package:productos_app/services/products_service.dart';
+import 'package:productos_app/services/services.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(AppState());
@@ -12,6 +12,7 @@ void main() => runApp(AppState());
     Widget build(BuildContext context) {
       return MultiProvider(
         providers: [
+            ChangeNotifierProvider(create: ( _ ) => AuthService()),
             ChangeNotifierProvider(create: ( _ ) => ProductsService())
         ],
         child: MyApp(),
@@ -27,11 +28,13 @@ class MyApp extends StatelessWidget {
       title: 'Productos App',
       initialRoute: 'login',
       routes: {
-        'login': ( _ ) => LoginScreen(),
-        'register': ( _ ) => RegisterScreen(),
+        'checking': ( _ ) => CheckAuthScreen(),
         'home' : ( _ ) => HomeScreen(),
+        'login': ( _ ) => LoginScreen(),
         'product': ( _ ) => ProductScreen(),
+        'register': ( _ ) => RegisterScreen(),
       },
+      scaffoldMessengerKey: NotificationsService.messengerKey,
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Colors.grey[300],
         appBarTheme: AppBarTheme(
